@@ -11,7 +11,9 @@
 
 ```python -m venv .venv```
 
-```source .venv/bin/activate```
+MacOS/Linux: ```source .venv/bin/activate```
+
+Windows: ```.venv/Scripts/activate```
 
 
 3. instalar dependencias
