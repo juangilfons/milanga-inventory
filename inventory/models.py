@@ -12,7 +12,7 @@ class Column(models.Model):
         subcolumns = SubColumn.objects.filter(total_tuppers__gt=0, column=self)
         total_tuppers_list = subcolumns.values_list('total_tuppers', flat=True)
         map_subcolumns_total_tuppers = dict(zip(subcolumns, total_tuppers_list))
-        groups = [iter(repeat(subcolumn, total_tuppers)) for subcolumn, total_tuppers in map_subcolumns_total_tuppers.items()]
+        groups = [repeat(subcolumn, total_tuppers) for subcolumn, total_tuppers in map_subcolumns_total_tuppers.items()]
 
         for subcolumns in zip_longest(*groups, fillvalue=None):
             for subcolumn in subcolumns:
