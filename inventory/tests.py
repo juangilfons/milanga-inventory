@@ -9,27 +9,31 @@ class TestDB(TestCase):
                 refrigerator=Refrigerator.objects.create(name="TestRefrigerator")
                 ),
             cut=Cut.objects.create(name='Carne',milas_per_tupper=10),
-            total_tuppers=2,
+            total_tuppers=3,
             milas_tupper_in_use=4
         )
 
         SubColumn.objects.create(
             column=Column.objects.get(pk=1),
             cut=Cut.objects.create(name='Pollo',milas_per_tupper=30),
-            total_tuppers=3,
+            total_tuppers=2,
             milas_tupper_in_use=15
         )
 
         SubColumn.objects.create(
             column=Column.objects.get(pk=1),
             cut=Cut.objects.create(name='Soja',milas_per_tupper=60),
-            total_tuppers=4,
+            total_tuppers=2,
             milas_tupper_in_use=30
         )
 
     
     def test(self):
         column=Column.objects.get(pk=1)
+        subcolumn1 = column.subcolumn_set.get(id=1)
+
+        subcolumn1.sell_milas(23)
+        print(subcolumn1.total_tuppers, subcolumn1.milas_tupper_in_use)
         print(list(column.subcolumn_generator()))
 
 

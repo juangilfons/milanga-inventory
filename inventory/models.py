@@ -30,10 +30,23 @@ class SubColumn(models.Model):
     milas_tupper_in_use = models.IntegerField()
     @property
     def total_milanesas(self):
-        return self.total_tuppers * self.cut
+        return self.total_tuppers * self.cut.milas_per_tupper
     @classmethod
     def search(cls, c):
         return cls.objects.filter(cut_name=c).count()
+    def sell_milas(self, milas_sold):
+        total_milas_available = (self.total_tuppers - 1) * self.cut.milas_per_tupper + self.milas_tupper_in_use
+        if milas_sold > total_milas_available:
+            raise ValueError("No hay milanesas suficientes.")
+
+        remaining_milas = self.milas_tupper_in_use - milas_sold
+
+        if remaining_milas > 0:
+            self.milas_tupper_in_use = remaining_milas
+        else:
+            self.total_tuppers -= 1 + (-remaining_milas) // self.cut.milas_per_tupper
+            self.milas_tupper_in_use = self.cut.milas_per_tupper - (-remaining_milas) % self.cut.milas_per_tupper
+        self.save()
 
 @dataclass
 class Tupper:
