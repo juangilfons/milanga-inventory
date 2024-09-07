@@ -5,6 +5,8 @@ from itertools import zip_longest, repeat
 # Create your models here.
 class Refrigerator(models.Model):
     name = models.CharField(max_length=100)
+    def __str__(self):
+        return self.name
 
 class Column(models.Model):
     refrigerator = models.ForeignKey(Refrigerator, on_delete=models.CASCADE)
@@ -22,6 +24,9 @@ class Column(models.Model):
 class Cut(models.Model):
     name = models.CharField(max_length=100, default='test')
     milas_per_tupper = models.IntegerField()
+
+    def __str__(self):
+        return self.name
 
 class SubColumn(models.Model):
     column = models.ForeignKey(Column, on_delete=models.CASCADE)

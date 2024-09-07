@@ -6,4 +6,15 @@
 
 {% block content %}
     <h1>Welcome to inventory!</h1>
+    {% for sub_column in sub_columns %}
+        <p>{{ sub_column.cut }}</p>
+    {% endfor %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Crear</button>
+</form>
+{% for heladera in heladeras %}
+    <p>{{ heladera }}</p>
+{% endfor %}
 {% endblock %}
