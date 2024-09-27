@@ -27,6 +27,7 @@ class Cut(models.Model):
     milas_per_tupper = models.IntegerField()
     reorder_threshold = models.IntegerField()
     reorder_tuppers = models.IntegerField()
+    is_order_pending = models.BooleanField(default=False)
 
     def add_tuppers(self, tuppers_num, column_id):
         column = Column.objects.get(pk=column_id)
@@ -44,14 +45,14 @@ class Cut(models.Model):
             raise ObjectDoesNotExist("No hay milanesas disponibles.")
         
         subcolumn.sell_milas(milas_num)
+        self.check_stock_and_reorder()
     
     def check_stock_and_reorder(self):
         total_stock = sum(subcolumn.total_milanesas for subcolumn in SubColumn.objects.filter(cut=self))
 
-        if total_stock < self.reorder_threshold:
+        if total_stock < self.reorder_threshold and not self.is_order_pending:
             Order.objects.create(cut=self, tuppers_requested=self.reorder_tuppers)
-
-    
+            self.is_order_pending = True
 
 class SubColumn(models.Model):
     column = models.ForeignKey(Column, on_delete=models.CASCADE)
@@ -100,6 +101,7 @@ class Order(models.Model):
     def fulfill(self, column_id):
         self.cut.add_tuppers(self.tuppers_requested, column_id)
         self.fulfilled = True
+        self.cut.is_order_pending = False
         self.save()
 
 @dataclass
