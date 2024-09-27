@@ -64,7 +64,10 @@ class SubColumn(models.Model):
         if self.total_tuppers == 0:
             self.delete()
         else:
-            super().save(*args, **kwargs)
+            if not self.milas_tupper_in_use:
+                self.milas_tupper_in_use = self.cut.milas_per_tupper
+            super(SubColumn, self).save(*args, **kwargs)
+            
     @property
     def total_milanesas(self):
         return self.total_tuppers * self.cut.milas_per_tupper
