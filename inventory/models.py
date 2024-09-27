@@ -25,8 +25,8 @@ class Column(models.Model):
 class Cut(models.Model):
     name = models.CharField(max_length=100, default='test')
     milas_per_tupper = models.IntegerField()
-    reorder_threshold = models.IntegerField()
-    reorder_tuppers = models.IntegerField()
+    reorder_threshold = models.IntegerField(default=10)
+    reorder_tuppers = models.IntegerField(default=10)
     is_order_pending = models.BooleanField(default=False)
 
     def add_tuppers(self, tuppers_num, column_id):
@@ -58,7 +58,7 @@ class SubColumn(models.Model):
     column = models.ForeignKey(Column, on_delete=models.CASCADE)
     cut = models.ForeignKey(Cut, on_delete=models.CASCADE)
     total_tuppers = models.IntegerField(default=0)
-    milas_tupper_in_use = models.IntegerField(default=cut.milas_per_tupper)
+    milas_tupper_in_use = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if self.total_tuppers == 0:
@@ -67,7 +67,7 @@ class SubColumn(models.Model):
             if not self.milas_tupper_in_use:
                 self.milas_tupper_in_use = self.cut.milas_per_tupper
             super(SubColumn, self).save(*args, **kwargs)
-            
+
     @property
     def total_milanesas(self):
         return self.total_tuppers * self.cut.milas_per_tupper
