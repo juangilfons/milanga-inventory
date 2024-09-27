@@ -27,14 +27,42 @@ class TestDB(TestCase):
             milas_tupper_in_use=30
         )
 
-    
     def test(self):
         column=Column.objects.get(pk=1)
         subcolumn1 = column.subcolumn_set.get(id=1)
 
-        subcolumn1.sell_milas(23)
+        subcolumn1.sell_milas(2)
+        subcolumn1.sell_milas(2)
         print(subcolumn1.total_tuppers, subcolumn1.milas_tupper_in_use)
-        print(list(column.subcolumn_generator()))
+        print(list(column.column_generator()))
+  
+    def test_sell_milas(self):
+        user_cut_to_sell = 1
+        milas_to_sell = 10
+
+        valid_subcolumn = SubColumn.search_cut(user_cut_to_sell)
+
+        column = Column.objects.get(pk=1)
+        print(list(column.column_generator()))
+        print(valid_subcolumn.total_tuppers, valid_subcolumn.milas_tupper_in_use)
+
+        valid_subcolumn.sell_milas(milas_to_sell)
+        print(list(column.column_generator()))
+        print(valid_subcolumn.total_tuppers, valid_subcolumn.milas_tupper_in_use)
+
+    def test_add_milas(self):
+        cut_incoming_tuppers = 1
+        tuppers_num = 12
+        selected_column = 1
+        column = Column.objects.get(pk=selected_column)
+
+        valid_subcolumn = SubColumn.search_column_cut(cut_incoming_tuppers, selected_column)
+
+        if valid_subcolumn:
+            valid_subcolumn.add_tuppers(tuppers_num)
+        
+        print(list(column.column_generator()))
+        print(valid_subcolumn.total_tuppers, valid_subcolumn.milas_tupper_in_use)
 
 
 class CutModelTest(TestCase):

@@ -1,6 +1,7 @@
 from django.db import models
 from dataclasses import dataclass
 from itertools import zip_longest, repeat
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your models here.
 class Refrigerator(models.Model):
@@ -8,7 +9,7 @@ class Refrigerator(models.Model):
 
 class Column(models.Model):
     refrigerator = models.ForeignKey(Refrigerator, on_delete=models.CASCADE)
-    def subcolumn_generator(self):
+    def column_generator(self):
         subcolumns = SubColumn.objects.filter(total_tuppers__gt=0, column=self)
         total_tuppers_list = subcolumns.values_list('total_tuppers', flat=True)
         map_subcolumns_total_tuppers = dict(zip(subcolumns, total_tuppers_list))
@@ -18,22 +19,52 @@ class Column(models.Model):
             for subcolumn in subcolumns:
                 if subcolumn is not None:
                     yield subcolumn.cut
+    
+
 
 class Cut(models.Model):
     name = models.CharField(max_length=100, default='test')
     milas_per_tupper = models.IntegerField()
 
+    def add_milas(self, tuppers_num, column_id):
+        column = Column.objects.get(pk=column_id)
+        subcolumn = SubColumn.search_column_cut(self, column)
+
+        if not subcolumn:
+            SubColumn.objects.create(column=column, cut=self)
+
+        subcolumn.add_tuppers(tuppers_num)
+    
+    def sell_milas(self, milas_num):
+        subcolumn = SubColumn.search_cut(self)
+
+        if not subcolumn:
+            raise ObjectDoesNotExist("No hay milanesas disponibles.")
+        
+        subcolumn.sell_milas(milas_num)
+
+    
+
 class SubColumn(models.Model):
     column = models.ForeignKey(Column, on_delete=models.CASCADE)
     cut = models.ForeignKey(Cut, on_delete=models.CASCADE)
-    total_tuppers = models.IntegerField()
-    milas_tupper_in_use = models.IntegerField()
+    total_tuppers = models.IntegerField(default=0)
+    milas_tupper_in_use = models.IntegerField(default=cut.milas_per_tupper)
+
+    def save(self, *args, **kwargs):
+        if self.total_tuppers == 0:
+            self.delete()
+        else:
+            super().save(*args, **kwargs)
     @property
     def total_milanesas(self):
         return self.total_tuppers * self.cut.milas_per_tupper
     @classmethod
-    def search(cls, c):
-        return cls.objects.filter(cut_name=c).count()
+    def search_cut(cls, cut):
+        return cls.objects.filter(cut=cut).first()
+    @classmethod
+    def search_column_cut(cls, cut, column):
+        return cls.objects.filter(column=column, cut=cut).first()
     def sell_milas(self, milas_sold):
         total_milas_available = (self.total_tuppers - 1) * self.cut.milas_per_tupper + self.milas_tupper_in_use
         if milas_sold > total_milas_available:
@@ -46,6 +77,10 @@ class SubColumn(models.Model):
         else:
             self.total_tuppers -= 1 + (-remaining_milas) // self.cut.milas_per_tupper
             self.milas_tupper_in_use = self.cut.milas_per_tupper - (-remaining_milas) % self.cut.milas_per_tupper
+        self.save()
+
+    def add_tuppers(self, num_tuppers):
+        self.total_tuppers += num_tuppers
         self.save()
 
 @dataclass
