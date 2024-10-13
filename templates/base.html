@@ -2,10 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}The Mila Store{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { width: 80%; margin: 0 auto; }
+        .buttons { margin-top: 20px; }
+        .buttons button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; margin-right: 10px; }
+    </style>
 </head>
 <body>
-    {% block content %}
-    {% endblock %}
+    <div class="container">
+        <h1>The Mila Store</h1>
+        {% block content %}{% endblock %}
+    </div>
 </body>
 </html>
