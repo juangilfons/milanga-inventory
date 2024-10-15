@@ -5,6 +5,10 @@
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
+    <header id="navbar">
+        <h1>The Mila Store</h1>
+        <a href="{% url 'logout' %}">logout</a>
+    </header>
     {% block content %}
     {% endblock %}
 </body>
