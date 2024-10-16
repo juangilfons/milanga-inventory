@@ -19,8 +19,6 @@ class Column(models.Model):
             for subcolumn in subcolumns:
                 if subcolumn is not None:
                     yield subcolumn.cut
-    
-
 
 class Cut(models.Model):
     name = models.CharField(max_length=100, default='test')
