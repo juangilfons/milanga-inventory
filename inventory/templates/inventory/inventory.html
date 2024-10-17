@@ -27,10 +27,16 @@
         <table class="stock-table">
             <thead>
                 <tr>
-                    <th>Type</th><th>Total Amount</th>
+                    <th>Type</th>
+                    <th>Stock (Tuppers)</th>
                 </tr>
             </thead>
-
+            {% for cut in cuts %}
+                <tr>
+                    <td>{{ cut.name }}</td>
+                    <td>{{ cut.total_stock }}</td>
+                </tr>
+            {% endfor %}
         </table>
     </div>
 {% endblock %}
