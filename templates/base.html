@@ -64,7 +64,7 @@
     <header id="navbar">
         <div id="tit">
             <h1>THE MILA STORE </h1>
-            <h3>Administrador: @Nombre</h3>
+            <h3>Administrador: {{ user.username }}</h3>
         </div>
         <button type="button">
             <a  class="btn btn-secondary" href="{% url 'logout' %}">Salir</a>
