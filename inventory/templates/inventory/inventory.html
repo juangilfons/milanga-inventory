@@ -7,21 +7,25 @@
 
 {% block content %}
     <div id="refrigerators">
-    <h2>Refrigerators</h2>
-    {% for refrigerator in refrigerators %}
-        <div class="refrigerator">
-            <h3>{{ refrigerator.name }}</h3>
-                {% for column in refrigerator.column_set.all %}
-                    <ul class="column">
-                        {% for subcolumn in column.subcolumn_set.all %}
-                            {% for tupper in subcolumn.total_tuppers|range_filter %}
-                                <p>{{ subcolumn.cut.name }}</p>
-                            {% endfor %}
+        <h1 class="display-3">Heladeras</h1>
+        <div id="divheladeras">
+            {% for refrigerator in refrigerators %}
+                <div class="conheladera">
+                    <h3 id="nombre">{{ refrigerator.name }}</h3>
+                    <div class="row">
+                        {% for column in refrigerator.column_set.all %}
+                            <ul class="column ">
+                                {% for subcolumn in column.subcolumn_set.all %}
+                                    {% for tupper in subcolumn.total_tuppers|range_filter %}
+                                        <li class="lis">{{ subcolumn.cut.name  }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
                         {% endfor %}
-                    </ul>
-                {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-    {% endfor %}
     </div>
     <div id="stock">
         <table class="stock-table">
