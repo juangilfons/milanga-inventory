@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
 {% load custom_tags %}
+{% load static %}
 
 {% block title %}
     Inventory - The Mila Store
 {% endblock %}
 
 {% block css_files %}
-
+    <link rel="stylesheet" href="{% static "inventory/inventory.css" %}">
 {% endblock %}
 
 {% block content %}
