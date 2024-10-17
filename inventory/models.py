@@ -27,6 +27,14 @@ class Cut(models.Model):
     reorder_tuppers = models.IntegerField(default=10)
     is_order_pending = models.BooleanField(default=False)
 
+    @property
+    def total_stock(self):
+        stock = 0
+        subcolumns = SubColumn.objects.filter(total_tuppers__gt=0, cut=self)
+        for subcolumn in subcolumns:
+            stock = stock + subcolumn.total_tuppers
+        return stock
+
     def add_tuppers(self, tuppers_num, column_id):
         column = Column.objects.get(pk=column_id)
         subcolumn = SubColumn.search_column_cut(self, column)
