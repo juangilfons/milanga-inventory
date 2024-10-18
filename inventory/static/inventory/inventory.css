@@ -1,0 +1,57 @@
+
+        .display-3{
+            width: 100%;
+            font-size:40px;
+            text-align: center;
+            margin: 0;
+        }
+        #refrigerators{
+            display:flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        #divheladeras{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            justify-content: space-between
+
+
+        }
+        .row{
+            margin: 0;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            float: left;
+            align-items: flex-end;
+            border: 2px solid black; /* REVISAR SI VA ACA O EN CN HELADERAS */
+            border-top: none; /* REVISAR SI VA ACA O EN CN HELADERAS*/
+            border-radius: 15px; /* REVISAR SI VA ACA O EN CN HELADERAS*/
+        }
+        .column{
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            width: 100px;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+        .lis{
+            display: inline-block;
+            background-color: lightsalmon;
+            border: 1px solid black;
+            border-radius:7px;
+            text-align: center;
+        }
+         #nombre{ /*NOMBRE H3*/
+        text-align: center;
+        width: 30%;
+        padding: 0;
+        margin:auto;
+                    }
+        .conheladera{
+            border-radius: 5px;
+            margin: 10px;
+        }
