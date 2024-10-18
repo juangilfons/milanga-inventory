@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory</title>
+</head>
+<body>
+    {% block title %}
+    <h1>Inventory Overview</h1>
+    {% endblock %}
+
+    {% block content %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Cut Name</th>
+                <th>Total Tuppers</th>
+                <th>Total Milanesas</th>
+                <th>Unit Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cut in cuts %}
+            <tr>
+                <td style="background-color: {{ cut.color }}; color: white">{{ cut.name }}</td>
+                <td>{{ cut.total_tuppers }}</td>
+                <td>{{ cut.total_milas }}</td>
+                <td>${{ cut.unit_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endblock %}
+</body>
+</html>

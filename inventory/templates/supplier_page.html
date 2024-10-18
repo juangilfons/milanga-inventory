@@ -1,0 +1,16 @@
+<h1>Supplier Page - Unfulfilled Orders</h1>
+
+{% for order, form in forms %}
+    <form method="POST">
+        {% csrf_token %}  <!-- Add this line to include CSRF token -->
+        <h2>
+            Order for {{ order.cut.name }} 
+            ({{ order.tuppers_requested }} requested, 
+            {{ order.tuppers_remaining }} remaining)
+        </h2>
+        {{ form.as_p }}
+        <input type="hidden" name="order_id" value="{{ order.id }}">
+        <button type="submit">Fulfill Order</button>
+        <hr>
+    </form>
+{% endfor %}
