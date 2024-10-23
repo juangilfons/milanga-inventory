@@ -22,7 +22,7 @@
                             <ul class="column ">
                                 {% for subcolumn in column.subcolumn_set.all %}
                                     {% for tupper in subcolumn.total_tuppers|range_filter %}
-                                        <li class="lis">{{ subcolumn.cut.name  }}</li>
+                                        <li class="lis" style="background-color: {{ subcolumn.cut.color }}">{{ subcolumn.cut.name  }}</li>
                                     {% endfor %}
                                 {% endfor %}
                             </ul>
@@ -43,7 +43,7 @@
             {% for cut in cuts %}
                 <tr>
                     <td>{{ cut.name }}</td>
-                    <td>{{ cut.total_stock }}</td>
+                    <td>{{ cut.total_tuppers }}</td>
                 </tr>
             {% endfor %}
         </table>
