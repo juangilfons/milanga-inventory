@@ -11,6 +11,17 @@
 {% endblock %}
 
 {% block content %}
+    <div class="legend">
+        <h3>Cut Legend</h3>
+        <ul>
+            {% for cut in cuts %}
+                <li>
+                    <span class="color-box" style="background-color: {{ cut.color }};"></span>
+                    {{ cut.name }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
     <div id="refrigerators">
         <h1 class="display-3">Heladeras</h1>
         <div id="divheladeras">
