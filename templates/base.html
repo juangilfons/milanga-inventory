@@ -19,9 +19,9 @@
             <a  class="btn btn-secondary" href="{% url 'logout' %}">Salir</a>
     </header>
     <div class="container-fluid">
-        <button type="button" class="btn btn-danger">Inventario</button>
-        <button type="button" class="btn btn-danger">Tabla pedido</button>
-        <button type="button" class="btn btn-danger">Reportes</button>
+        <a href="{% url 'inventory' %}"><button type="button" class="btn btn-danger">Inventario</button></a>
+        <a href="{% url 'orders' %}"><button type="button" class="btn btn-danger">Tabla pedido</button></a>
+        <a href=""><button type="button" class="btn btn-danger">Reportes</button></a>
     </div>
     {% block content %}
     {% endblock %}

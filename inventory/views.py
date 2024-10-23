@@ -16,3 +16,9 @@ def inventory(request):
         'cuts': cuts
     }
     return render(request, 'inventory/inventory.html', context)
+
+def sell_milas(request):
+    return render(request, 'inventory/sell_milas.html')
+
+def orders(request):
+    return render(request, 'inventory/orders.html')
