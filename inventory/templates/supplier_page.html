@@ -2,7 +2,7 @@
 
 {% for order, form in forms %}
     <form method="POST">
-        {% csrf_token %}  <!-- Add this line to include CSRF token -->
+        {% csrf_token %} 
         <h2>
             Order for {{ order.cut.name }} 
             ({{ order.tuppers_requested }} requested, 

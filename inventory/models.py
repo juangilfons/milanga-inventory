@@ -143,6 +143,10 @@ class Order(models.Model):
             raise ValueError("Cannot fulfill more tuppers than remaining.")
         self.cut.add_tuppers(tuppers_to_add, column_id)
         self.tuppers_remaining -= tuppers_to_add
+        if (self.tuppers_remaining == 0):
+            self.cut.is_order_pending = False
+            self.cut.save()
+        self.cut.check_stock_and_reorder()
         self.save()
 
     # def fulfill(self, column_id):
