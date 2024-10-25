@@ -3,6 +3,10 @@ from dataclasses import dataclass
 from itertools import zip_longest, repeat
 from django.core.exceptions import ObjectDoesNotExist
 from colorfield.fields import ColorField
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+from django.contrib.auth.models import User
+from datetime import datetime, timedelta
 
 # Create your models here.
 class Refrigerator(models.Model):
@@ -31,6 +35,13 @@ class Column(models.Model):
                 if subcolumn is not None:
                     yield subcolumn.cut
     
+    @classmethod
+    def get_column(cls, refrigerator_id, column_pos):
+        return Column.objects.filter(refrigerator_id=refrigerator_id).order_by('id')[column_pos]
+    
+    def __str__(self):
+        return f"Refrigerator: {self.refrigerator.name}, Column: {(list(Column.objects.filter(refrigerator=self.refrigerator).order_by('id').values_list('id', flat=True))).index(self.id) + 1}"
+    
 
 class Cut(models.Model):
     name = models.CharField(max_length=100, default='test')
@@ -40,6 +51,7 @@ class Cut(models.Model):
     is_order_pending = models.BooleanField(default=False)
     color = ColorField(default='#FF0000')
     unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    days_until_expiration = models.IntegerField(default=7)
 
     @property
     def total_tuppers(self):
@@ -58,7 +70,7 @@ class Cut(models.Model):
 
         subcolumn.add_tuppers(tuppers_num)
     
-    def sell_milas(self, milas_num):
+    def sell_milas(self, milas_num, user):
         total_milas_available = self.total_milas
 
         if milas_num > total_milas_available:
@@ -76,6 +88,13 @@ class Cut(models.Model):
             total_sold += milas_sold_from_subcolumn
         
         self.check_stock_and_reorder()
+
+        ActionLog.create_action_log(
+            user=user,
+            obj=self,
+            action_type='SALE',
+            description=f"Sold {milas_num} milanesas"
+        )
     
     def check_stock_and_reorder(self):
         total_tuppers = sum(subcolumn.total_tuppers for subcolumn in SubColumn.objects.filter(cut=self))
@@ -107,7 +126,7 @@ class SubColumn(models.Model):
         return (self.total_tuppers - 1) * self.cut.milas_per_tupper + self.milas_tupper_in_use
     @classmethod
     def search_cut(cls, cut):
-        return cls.objects.filter(cut=cut).order_by('id')
+        return cls.objects.filter(cut=cut).order_by('column__refrigerator_id', 'id')
     @classmethod
     def search_column_cut(cls, cut, column):
         return cls.objects.filter(column=column, cut=cut).first()
@@ -137,8 +156,10 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     # fulfilled = models.BooleanField(default=False)
     tuppers_remaining = models.IntegerField()
-
-    def allocate_tuppers(self, column_id, tuppers_to_add):
+    scheduled_date = models.DateTimeField(blank=True, null=True)
+    
+    
+    def allocate_tuppers(self, column_id, tuppers_to_add, user):
         if tuppers_to_add > self.tuppers_remaining:
             raise ValueError("Cannot fulfill more tuppers than remaining.")
         self.cut.add_tuppers(tuppers_to_add, column_id)
@@ -148,6 +169,12 @@ class Order(models.Model):
             self.cut.save()
         self.cut.check_stock_and_reorder()
         self.save()
+        ActionLog.create_action_log(
+            user=user,
+            obj=self,
+            action_type='FULFILLMENT',
+            description=f"Allocated {tuppers_to_add} tuppers to column {column_id}"
+        )
 
     # def fulfill(self, column_id):
     #     self.cut.add_tuppers(self.tuppers_requested, column_id)
@@ -156,10 +183,52 @@ class Order(models.Model):
     #     self.save()
 
     def save(self, *args, **kwargs):
-        if self.pk is None:  # New order being created
-            self.tuppers_remaining = self.tuppers_requested  # Initialize remaining tuppers to the requested amount
+        # Check if this is a new order (pk is None)
+        if self.pk is None:
+            # Set tuppers_remaining to tuppers_requested for new orders
+            self.tuppers_remaining = self.tuppers_requested
+            
+            # Set scheduled_date to the next Tuesday if not already set
+            if not self.scheduled_date:
+                now = timezone.now()
+                days_until_tuesday = 8 - now.weekday()
+                self.scheduled_date = now + timedelta(days=days_until_tuesday)
+
+        # Call the original save method
         super(Order, self).save(*args, **kwargs)
 
+class ActionLog(models.Model):
+    ACTION_CHOICES = [
+        ('FULFILLMENT', 'Supplier Order Fulfillment'),
+        ('SALE', 'Sale of Milanesas'),
+        ('ADMIN_ACTION', 'Inventory Management'),
+    ]
+
+    ROLE_CHOICES = [
+        ('ADMIN', 'Admin'),
+        ('EMPLOYEE', 'Employee'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_role = models.CharField(max_length=20, choices=ROLE_CHOICES, blank=True)
+    action_type = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    object_repr = models.CharField(max_length=200)
+    action_description = models.TextField()
+    action_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.get_action_type_display()} ({self.action_time})"
+    
+    def create_action_log(user, obj, action_type, description):
+        user_role = 'ADMIN' if user.is_superuser else 'EMPLOYEE'
+        ActionLog.objects.create(
+            user=user,
+            user_role=user_role,
+            action_type=action_type,
+            object_repr=str(obj),
+            action_description=description,
+            action_time=timezone.now()
+        )
 
 @dataclass
 class Tupper:

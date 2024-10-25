@@ -11,4 +11,5 @@ urlpatterns = [
     path('inventory/', views.inventory_page, name='inventory'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('ajax/get-columns/', views.get_columns_for_refrigerator, name='get_columns_for_refrigerator'), 
 ]

@@ -14,3 +14,33 @@
         <hr>
     </form>
 {% endfor %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const refrigeratorSelects = document.querySelectorAll('select[id$="refrigerator"]');
+        refrigeratorSelects.forEach(select => {
+            select.addEventListener('change', function () {
+                const refrigeratorId = this.value;
+                const form = this.closest('form');
+                const columnSelect = form.querySelector('select[id$="column"]');
+
+                if (refrigeratorId) {
+                    fetch(`/ajax/get-columns/?refrigerator_id=${refrigeratorId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            columnSelect.innerHTML = '<option value="">Select Column</option>';
+                            data.forEach((columnId, index) => {
+                                const option = document.createElement('option');
+                                option.value = index + 1;
+                                option.textContent = index + 1;  // Position number for display
+                                columnSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error('Error fetching columns:', error));
+                } else {
+                    columnSelect.innerHTML = '<option value="">Select Column</option>';
+                }
+            });
+        });
+    });
+</script>
