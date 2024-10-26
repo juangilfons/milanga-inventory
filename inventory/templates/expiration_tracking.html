@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Allocations</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Allocations</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Cut Name</th>
+                <th>Order ID</th>
+                <th>Expiration Date</th>
+                <th>Column</th>
+                <th>Tuppers Allocated</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order_id, allocations in grouped_allocations.items %}
+                {% if allocations %}
+                    <!-- First row with rowspan for merged cells -->
+                    <tr>
+                        <td rowspan="{{ allocations|length }}">{{ allocations.0.order.cut.name }}</td>
+                        <td rowspan="{{ allocations|length }}">{{ allocations.0.order.id }}</td>
+                        <td rowspan="{{ allocations|length }}">{{ allocations.0.order.expiration_date }}</td>
+                        <td>{{ allocations.0.column }}</td>
+                        <td>{{ allocations.0.tuppers_allocated }}</td>
+                    </tr>
+                    
+                    <!-- Remaining rows for this Order ID group -->
+                    {% for allocation in allocations|slice:"1:" %}
+                        <tr>
+                            <td>{{ allocation.column }}</td>
+                            <td>{{ allocation.tuppers_allocated }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
+
