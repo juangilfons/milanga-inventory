@@ -1,0 +1,43 @@
+
+.form-styled {
+    max-width: 400px;
+    margin: 30px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color:#eec9c9;
+}
+
+
+
+.form-styled label {
+    font-weight: bold;
+    color: #333;
+}
+
+.form-styled input[type="number"],
+.form-styled select,
+.form-styled textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-styled .btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.mensaje-lista {
+    list-style-type: none;
+    text-align: center;
+        font-weight: bold;
+    margin-top: 5px;
+    font-size: 25px;
+
+}

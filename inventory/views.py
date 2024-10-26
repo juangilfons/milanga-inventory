@@ -29,7 +29,7 @@ def sell_milas(request):
 
             try:
                 cut.sell_milas(milas_to_sell)  # This will handle selling milas
-                messages.success(request, f"Successfully sold {milas_to_sell} milas from {cut.name}!")
+                messages.success(request, f"Venta exitosa de {milas_to_sell} milanesas de {cut.name}!")
             except ObjectDoesNotExist:
                 messages.error(request, "No milanesas available for this cut.")
             except ValueError as e:

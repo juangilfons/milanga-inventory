@@ -11,23 +11,21 @@
 {% endblock %}
 
 {% block content %}
-    <div class="legend">
-        <h3>Cut Legend</h3>
-        <ul>
+    <div class="sidebar">
+        <h3 id="leyenda">Leyenda</h3>
+        <ul id="figuras">
             {% for cut in cuts %}
                 <li>
                     <span class="color-box" style="background-color: {{ cut.color }};"></span>
-                    {{ cut.name }}
+                   <h3 id="nombreley"> {{ cut.name }}</h3>
                 </li>
             {% endfor %}
         </ul>
     </div>
-    <div id="refrigerators">
-        <h1 class="display-3">Heladeras</h1>
         <div id="divheladeras">
             {% for refrigerator in refrigerators %}
                 <div class="conheladera">
-                    <h3 id="nombre">{{ refrigerator.name }}</h3>
+                    <h3 class="nombre">{{ refrigerator.name }}</h3>
                     <div class="row">
                         {% for column in refrigerator.column_set.all %}
                             <ul class="column ">
@@ -42,7 +40,6 @@
                 </div>
             {% endfor %}
         </div>
-    </div>
     <div id="stock">
         <table class="stock-table">
             <thead>

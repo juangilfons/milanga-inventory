@@ -10,19 +10,21 @@
 {% endblock %}
 
 {% block content %}
-    <h2>Sell Milas</h2>
     {% if messages %}
-        <ul>
+        <ul class="mensaje-lista">
             {% for message in messages %}
                 <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
             {% endfor %}
         </ul>
     {% endif %}
 
-    <form method="post">
+    <form method="post" class="form-styled">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Sell</button>
+        <button type="submit"  class="btn btn-danger">Vender</button>
     </form>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+            document.getElementById("ventanaventa").style.display = "none";
+    </script>
 {% endblock %}
-

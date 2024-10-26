@@ -23,25 +23,27 @@
             margin-bottom: 5px;
         }
 
-        .color-box {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            border: 1px solid #000;
-        }
+            .color-box {
+                display: flex;
+                width: 20px;
+                height: 20px;
+                margin-right: 10px;
+                border: 1px solid #000;
+            }
+
         #refrigerators{
             display:flex;
             flex-direction: row;
             flex-wrap: wrap;
             justify-content: space-around;
         }
-        #divheladeras{
+        #divheladeras {
+            width: 90%;
             display: flex;
             flex-direction: row;
-            width: 100%;
-            justify-content: space-between
-
-
+            margin: 50px;
+            flex-wrap: wrap;
+            justify-content: space-between;
         }
         .row{
             margin: 0;
@@ -69,13 +71,102 @@
             border-radius:7px;
             text-align: center;
         }
-         #nombre{ /*NOMBRE H3*/
-        text-align: center;
-        width: 30%;
-        padding: 0;
-        margin:auto;
-                    }
+        .nombre{ /*NOMBRE H3*/
+            text-align: center;
+            padding: 0;
+            margin:auto;
+            text-transform: uppercase;
+        }
         .conheladera{
+            display: grid;
             border-radius: 5px;
             margin: 10px;
+            height: 300px;
+            justify-content: end;
+        }
+        .sidebar {
+            position: fixed;
+            top: 60%;
+            right: -150px;
+            width: 200px;
+            background-color: #4CAF50;
+            color: white;
+            transform: translateY(-50%);
+            transition: right 0.3s ease;
+            padding: 10px;
+            border-radius: 5px 0 0 5px;
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            align-items: center;
+            letter-spacing: -1px;
+        }
+
+
+        .sidebar:hover {
+            right: 0;
+        }
+        .sidebar h3 {
+            writing-mode: vertical-lr;
+            text-orientation: upright;
+            margin: 0;
+            font-size: 20px;
+
+        }
+        dl, ol, ul { /*contenido side bar*/
+            margin-top: 0;
+            list-style-type: none;
+        }
+        #figuras {
+            display: flex;
+            align-content: space-around;
+            flex-direction: column;
+        }
+
+        ul li {
+            display: flex;
+        }
+        #nombreley{
+            writing-mode: horizontal-tb;
+            margin-left: 5px;
+
+        }
+        #leyenda{
+            letter-spacing: -6px;
+        }
+        .stock-table{
+            width: 100%;                    /* Ocupa todo el ancho del contenedor */
+            border-collapse: collapse;       /* Quita los espacios entre celdas */
+            font-family: Arial, sans-serif;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;                   /* Espacio dentro de cada celda */
+            text-align: left;                /* Alineación del texto */
+            border-bottom: 1px solid #ddd;   /* Línea sutil entre filas */
+        }
+
+        th {
+            background-color: #4CAF50;       /* Color de fondo para encabezado */
+            color: white;                    /* Color del texto en encabezado */
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;       /* Color alternado en filas pares */
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;       /* Efecto hover para mejorar UX */
+        }
+
+        table caption {
+            caption-side: top;               /* Ubicación del título de la tabla */
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 10px;
+            color: #333;
         }

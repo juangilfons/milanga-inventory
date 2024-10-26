@@ -16,14 +16,17 @@
             <h1>THE MILA STORE </h1>
             <h3>Administrador: {{ user.username }}</h3>
         </div>
-            <a  class="btn btn-secondary" href="{% url 'logout' %}">Salir</a>
+            <a  class="btn btn-secondary" href="{% url 'logout' %}"><p>Salir</p></a>
     </header>
     <div class="container-fluid">
         <a href="{% url 'inventory' %}"><button type="button" class="btn btn-danger">Inventario</button></a>
         <a href="{% url 'orders' %}"><button type="button" class="btn btn-danger">Tabla pedido</button></a>
         <a href=""><button type="button" class="btn btn-danger">Reportes</button></a>
     </div>
-    {% block content %}
+    <div  class="centered-container" >
+    <a href="{% url 'sell_milas' %}" id="ventanaventa" class="btn btn-danger venta" >Venta</a>
+    </div>
+        {% block content %}
     {% endblock %}
 </body>
 </html>
