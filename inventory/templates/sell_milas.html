@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sell Milas</title>
+    </head>
+<body>
+    <h1>Sell Milanesas</h1>
+
+    <!-- Display any success or error messages -->
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Sell</button>
+    </form>
+
+    <a href="{% url 'refrigerators' %}">Back to Refrigerators</a>
+</body>
+</html>

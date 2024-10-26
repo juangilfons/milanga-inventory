@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'inventory.apps.InventoryConfig',
     "accounts.apps.AccountsConfig",
-    'colorfield'
+    'colorfield',
 ]
 
 MIDDLEWARE = [
