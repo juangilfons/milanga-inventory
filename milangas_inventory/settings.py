@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'inventory.apps.InventoryConfig',
-    "accounts.apps.AccountsConfig"
+    "accounts.apps.AccountsConfig",
     'colorfield',
 ]
 
