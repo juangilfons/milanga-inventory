@@ -157,13 +157,26 @@ class Order(models.Model):
     # fulfilled = models.BooleanField(default=False)
     tuppers_remaining = models.IntegerField()
     scheduled_date = models.DateTimeField(blank=True, null=True)
-    
+    expiration_date = models.DateTimeField(blank=True, null=True)
+
     
     def allocate_tuppers(self, column_id, tuppers_to_add, user):
         if tuppers_to_add > self.tuppers_remaining:
             raise ValueError("Cannot fulfill more tuppers than remaining.")
+        column = Column.objects.get(id=column_id)
+
         self.cut.add_tuppers(tuppers_to_add, column_id)
         self.tuppers_remaining -= tuppers_to_add
+
+        allocation, created = OrderAllocation.objects.get_or_create(
+            order=self,
+            column=column,
+            defaults={'tuppers_allocated': tuppers_to_add}
+        )
+        if not created:
+            allocation.tuppers_allocated += tuppers_to_add
+            allocation.save()
+
         if (self.tuppers_remaining == 0):
             self.cut.is_order_pending = False
             self.cut.save()
@@ -193,9 +206,15 @@ class Order(models.Model):
                 now = timezone.now()
                 days_until_tuesday = 8 - now.weekday()
                 self.scheduled_date = now + timedelta(days=days_until_tuesday)
+            
+            self.expiration_date = self.scheduled_date + timedelta(days=self.cut.days_until_expiration)
 
         # Call the original save method
         super(Order, self).save(*args, **kwargs)
+
+    def get_column_allocations(self):
+        # Retrieve all allocations related to this order
+        return OrderAllocation.objects.filter(order=self)
 
 class ActionLog(models.Model):
     ACTION_CHOICES = [
@@ -229,6 +248,12 @@ class ActionLog(models.Model):
             action_description=description,
             action_time=timezone.now()
         )
+
+class OrderAllocation(models.Model):
+    order = models.ForeignKey(Order, related_name='allocations', on_delete=models.CASCADE)
+    column = models.ForeignKey(Column, on_delete=models.CASCADE)
+    tuppers_allocated = models.IntegerField()
+
 
 @dataclass
 class Tupper:

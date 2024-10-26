@@ -42,7 +42,6 @@ def sell_milas_view(request):
     return render(request, 'sell_milas.html', {'form': form})
 
 def supplier_page(request):
-    print('teeeeeeeeeeest')
     unfulfilled_orders = Order.objects.filter(tuppers_remaining__gt=0)
 
     if request.method == 'POST':
