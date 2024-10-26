@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -28,7 +29,7 @@ def sell_milas(request):
             milas_to_sell = form.cleaned_data['milas_to_sell']
 
             try:
-                cut.sell_milas(milas_to_sell)  # This will handle selling milas
+                cut.sell_milas(milas_to_sell, request.user)  # This will handle selling milas
                 messages.success(request, f"Venta exitosa de {milas_to_sell} milanesas de {cut.name}!")
             except ObjectDoesNotExist:
                 messages.error(request, "No milanesas available for this cut.")
@@ -78,3 +79,9 @@ def orders(request):
 
     context = {'forms': forms}
     return render(request, 'inventory/orders.html', context)
+
+
+def get_columns_for_refrigerator(request):
+    refrigerator_id = request.GET.get('refrigerator_id')
+    column_ids = Column.objects.filter(refrigerator_id=refrigerator_id).values_list('id', flat=True)
+    return JsonResponse(list(column_ids), safe=False)
