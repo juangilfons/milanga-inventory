@@ -16,7 +16,8 @@
             <h1>THE MILA STORE </h1>
             <h3>Administrador: {{ user.username }}</h3>
         </div>
-            <a  class="btn btn-secondary" href="{% url 'logout' %}"><p>Salir</p></a>
+        <a href="{% url 'admin:index' %}" id="secondary">Admin</a>
+        <a href="{% url 'logout' %}" id="secondary">Salir</a>
     </header>
     <div class="container-fluid">
         <a href="{% url 'inventory' %}"><button type="button" class="btn btn-danger">Inventario</button></a>

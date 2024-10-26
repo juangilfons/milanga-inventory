@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Login</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <link rel="stylesheet" href= " /accounts/login.css">
 
 </head>
 <style>
@@ -15,7 +14,6 @@
         min-height:550px;
         overflow-y: hidden;
     }
-
     .login-reg-panel{
         position: relative;
         top: 50%;
@@ -38,9 +36,10 @@
         z-index:0;
         box-shadow: 0 0 15px 9px #00000096;
     }
-#form{
-    margin:110px;
-}
+    #form{
+        margin:100px;
+    }
+
     h2{
         right:10%;
         bottom: 50%;
@@ -53,14 +52,7 @@
     }
 
 
-.login-show input[type="text"], .login-show input[type="password"]{
-    width: 100%;
-    display: block;
-    margin:20px 0;
-    padding: 15px;
-    border: 1px solid #b5b5b5;
-    outline: none;
-}
+
     #texto{
         padding-top: 100px;
         display: flex;
@@ -78,7 +70,41 @@
         color: white;
         margin-bottom:10px;
     }
+.errorlist {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 0 10px;
+  color: red;
+  width: 100%;
+}
 
+
+p {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  width: 100%;
+}
+    label {
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+input[type="text"], input[type="password"] {
+  width: 100%; /* Asegura que ambos inputs ocupen el 100% del contenedor */
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px; /* Define el mismo tamaño de fuente para uniformidad */
+}
 
 </style>
 <body>

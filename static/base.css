@@ -35,11 +35,22 @@ header {
     margin:5px;
 }
 
-.btn-secondary {
-    width:15%;
-    margin-right: 10px;
-    font-size: 20px;           /* Aumenta el tamaño del texto */
-    text-align: center;          /* Asegura que el texto esté centrado */
+#secondary {
+    text-align: center;
+    width: 10%;
+    background-color: white;
+    color: black;
+    margin-right: 5px;
+    font-size: 25px;
+    border: 1px solid black;
+    text-decoration: none;
+    border-radius: 5px; /* Bordes redondeados */
+    transition: background-color 0.3s, color 0.3s; /* Transición suave */
+}
+
+#secondary:hover {
+  background-color: black; /* Fondo negro al pasar el mouse */
+  color: white; /* Texto en blanco al pasar el mouse */
 }
 
 #tit {
@@ -50,8 +61,8 @@ header {
 
 h1 {
     text-align: center;
-    display: inline-block; /* Elimina el ancho completo */
-    margin: 0; /* Elimina el margen por defecto */
+    display: inline-block;
+    margin: 0;
 }
 
 .venta{
@@ -63,5 +74,5 @@ h1 {
     font-size:30px;
 }
 .centered-container {
-    display: flex; /* Usa Flexbox para centrar */
+    display: flex;
 }

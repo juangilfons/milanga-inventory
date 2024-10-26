@@ -138,35 +138,35 @@
             letter-spacing: -6px;
         }
         .stock-table{
-            width: 100%;                    /* Ocupa todo el ancho del contenedor */
-            border-collapse: collapse;       /* Quita los espacios entre celdas */
+            width: 100%;
+            border-collapse: collapse;
             font-family: Arial, sans-serif;
             margin-top: 20px;
         }
         th, td {
-            padding: 12px;                   /* Espacio dentro de cada celda */
-            text-align: left;                /* Alineación del texto */
-            border-bottom: 1px solid #ddd;   /* Línea sutil entre filas */
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
         }
 
         th {
-            background-color: #4CAF50;       /* Color de fondo para encabezado */
-            color: white;                    /* Color del texto en encabezado */
+            background-color: #4CAF50;
+            color: white;
             font-weight: bold;
         }
 
         tr:nth-child(even) {
-            background-color: #f9f9f9;       /* Color alternado en filas pares */
+            background-color: #f9f9f9;
         }
 
         tr:hover {
-            background-color: #f1f1f1;       /* Efecto hover para mejorar UX */
+            background-color: #f1f1f1;
         }
 
         table caption {
-            caption-side: top;               /* Ubicación del título de la tabla */
+            caption-side: top;
             font-size: 1.2rem;
             font-weight: bold;
-            padding: 10px;
+            padding:5px;
             color: #333;
         }
