@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Refrigerator, Cut, Order, SubColumn, OrderAllocation
+from .models import Refrigerator, Cut, Order, SubColumn, OrderAllocation, Column
 from .forms import SellMilasForm, FulfillOrderForm
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
@@ -100,4 +100,4 @@ def expiration_tracking_view(request):
         'grouped_allocations': dict(grouped_allocations),  # Convert to regular dict for easier template access
     }
 
-    return render(request, 'expiration_tracking.html', context)
+    return render(request, 'inventory/reports.html', context)

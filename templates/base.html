@@ -21,7 +21,7 @@
     <div class="container-fluid">
         <a href="{% url 'inventory' %}"><button type="button" class="btn btn-danger">Inventario</button></a>
         <a href="{% url 'orders' %}"><button type="button" class="btn btn-danger">Tabla pedido</button></a>
-        <a href=""><button type="button" class="btn btn-danger">Reportes</button></a>
+        <a href="{% url 'reports' %}"><button type="button" class="btn btn-danger">Reportes</button></a>
     </div>
     <div  class="centered-container" >
     <a href="{% url 'sell_milas' %}" id="ventanaventa" class="btn btn-danger venta" >Venta</a>
