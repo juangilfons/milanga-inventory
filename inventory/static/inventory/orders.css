@@ -1,0 +1,62 @@
+
+.form-styled {
+    width:80%;
+    margin: 10px auto;
+    border: 2px solid black;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #eec9c9;
+}
+
+
+
+.form-styled h2 {
+    text-align: center;
+    font-size: 1.5em;
+    margin-bottom: 1em;
+}
+
+.form-styled p {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1em;
+}
+
+.form-styled p label {
+    font-weight: bold;
+    margin-bottom: 0.3em;
+}
+
+.form-styled input[type="number"],
+.form-styled select,
+.form-styled input[type="text"] {
+    padding: 8px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.form-styled input[type="number"]:focus,
+.form-styled select:focus,
+.form-styled input[type="text"]:focus {
+    outline: none;
+    border-color: #66afe9;
+    box-shadow: 0 0 5px rgba(102, 175, 233, 0.6);
+}
+
+.form-styled button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: brown;
+    color: white;
+    font-size: 1em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1em;
+}
+
+.form-styled button[type="submit"]:hover {
+    background-color: crimson;
+}

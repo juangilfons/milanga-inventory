@@ -7,19 +7,19 @@ class SellMilasForm(forms.Form):
 
 class FulfillOrderForm(forms.Form):
     tuppers_to_add = forms.IntegerField(
-        label='Tuppers to Add',
+        label='Cantidad de tupper a agregar',
         min_value=0,
         required=False,
         initial=0,
     )
     refrigerator = forms.ChoiceField(
         choices=[],  # Initially empty, will populate in the view
-        label="Select Refrigerator",
+        label="Seleccione heladera",
         required=True,
     )
     column = forms.ChoiceField(
         choices=[],  # Initially empty, will populate dynamically in JavaScript
-        label="Select Column",
+        label="Seleccione la columna",
         required=True,
     )
 

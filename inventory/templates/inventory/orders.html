@@ -10,20 +10,17 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Supplier Page - Unfulfilled Orders</h1>
-
     {% for order, form in forms %}
-        <form method="POST">
+        <form method="POST" class="form-styled">
             {% csrf_token %}
             <h2>
-                Order for {{ order.cut.name }}
-                ({{ order.tuppers_requested }} requested,
-                {{ order.tuppers_remaining }} remaining)
+                Orden de {{ order.cut.name }}
+                ({{ order.tuppers_requested }} necesarias,
+                {{ order.tuppers_remaining }} sin guardar)
             </h2>
             {{ form.as_p }}
             <input type="hidden" name="order_id" value="{{ order.id }}">
             <button type="submit">Fulfill Order</button>
-            <hr>
         </form>
     {% endfor %}
 
