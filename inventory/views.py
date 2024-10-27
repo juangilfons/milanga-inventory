@@ -1,13 +1,14 @@
-from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
-
+from .models import Refrigerator, Cut, Order, SubColumn, OrderAllocation
 from .forms import SellMilasForm, FulfillOrderForm
-from inventory.models import Refrigerator, Cut, Column, Order
-
-
+from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, logout
+from django.http import JsonResponse
+from django.db.models import Sum
+from collections import defaultdict
 # Create your views here.
 
 @login_required
@@ -85,3 +86,18 @@ def get_columns_for_refrigerator(request):
     refrigerator_id = request.GET.get('refrigerator_id')
     column_ids = Column.objects.filter(refrigerator_id=refrigerator_id).values_list('id', flat=True)
     return JsonResponse(list(column_ids), safe=False)
+
+
+def expiration_tracking_view(request):
+    allocations = OrderAllocation.objects.select_related('order', 'order__cut', 'column').order_by('order__cut__name', 'order__expiration_date')
+
+    # Group allocations by `Order ID`
+    grouped_allocations = defaultdict(list)
+    for allocation in allocations:
+        grouped_allocations[allocation.order.id].append(allocation)
+
+    context = {
+        'grouped_allocations': dict(grouped_allocations),  # Convert to regular dict for easier template access
+    }
+
+    return render(request, 'expiration_tracking.html', context)

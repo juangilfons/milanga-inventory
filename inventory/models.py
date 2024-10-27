@@ -131,12 +131,14 @@ class SubColumn(models.Model):
     @classmethod
     def search_column_cut(cls, cut, column):
         return cls.objects.filter(column=column, cut=cut).first()
+    
     def sell_milas(self, milas_sold):
         total_milas_available = self.total_milanesas
         print(total_milas_available, milas_sold)
         if milas_sold > total_milas_available:
             milas_sold = total_milas_available
 
+        initial_total_tuppers = self.total_tuppers
         remaining_milas = self.milas_tupper_in_use - milas_sold
 
         if remaining_milas > 0:
@@ -145,12 +147,40 @@ class SubColumn(models.Model):
             self.total_tuppers -= 1 + (-remaining_milas) // self.cut.milas_per_tupper
             self.milas_tupper_in_use = self.cut.milas_per_tupper - (-remaining_milas) % self.cut.milas_per_tupper
         self.save()
-        return milas_sold
 
+        tuppers_consumed = initial_total_tuppers - self.total_tuppers
+        if tuppers_consumed > 0:
+            self.reduce_order_allocation_tuppers(tuppers_consumed)
+
+        return milas_sold
+    
+    def reduce_order_allocation_tuppers(self, tuppers_consumed):
+        allocations = OrderAllocation.objects.filter(
+            order__cut=self.cut,
+            tuppers_allocated__gt=0
+        ).order_by('order__expiration_date')
+
+        for allocation in allocations:
+            if tuppers_consumed <= 0:
+                break
+
+            if allocation.tuppers_allocated >= tuppers_consumed:
+                allocation.tuppers_allocated -= tuppers_consumed
+                allocation.save(update_fields=['tuppers_allocated'])
+                tuppers_consumed = 0
+            else:
+                tuppers_consumed -= allocation.tuppers_allocated
+                allocation.tuppers_allocated = 0
+                allocation.save(update_fields=['tuppers_allocated'])
+
+            if allocation.tuppers_allocated == 0:
+                allocation.delete()
+            
     def add_tuppers(self, num_tuppers):
         self.total_tuppers += num_tuppers
         self.save()
-
+    
+    
 class Order(models.Model):
     cut = models.ForeignKey(Cut, on_delete=models.CASCADE)
     tuppers_requested = models.IntegerField()
