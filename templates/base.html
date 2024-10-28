@@ -14,9 +14,11 @@
     <header id="navbar">
         <div id="tit">
             <h1>THE MILA STORE </h1>
-            <h3>Administrador: {{ user.username }}</h3>
+            <h3>{% if user.is_staff or user.is_superuser %}Administrador{% else %}Empleado{% endif %}: {{ user.username }}</h3>
         </div>
-        <a href="{% url 'admin:index' %}" id="secondary">Admin</a>
+        {% if user.is_staff or user.is_superuser %}
+            <a href="{% url 'admin:index' %}" id="secondary">Admin</a>
+        {% endif %}
         <a href="{% url 'logout' %}" id="secondary">Salir</a>
     </header>
     <div class="container-fluid">
