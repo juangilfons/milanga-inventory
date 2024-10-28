@@ -27,20 +27,11 @@ class FulfillOrderForm(forms.Form):
         self.order = kwargs.pop('order', None)
         super().__init__(*args, **kwargs)
         # Populate refrigerator choices as (id, name) tuples
-        self.fields['refrigerator'].choices = [
-            (refrigerator.id, refrigerator.id) for refrigerator in Refrigerator.objects.all()
-        ]
+        self.fields['refrigerator'].choices = [('', 'Select Refrigerator:')] + [(refrigerator.id, refrigerator.name) for refrigerator in Refrigerator.objects.all()]
 
-        if 'refrigerator' in self.data:
-            try:
-                refrigerator_id = int(self.data.get('refrigerator'))
-                self.fields['column'].choices = [
-                    (index + 1, index + 1)
-                    for index, column in enumerate(Column.objects.filter(refrigerator_id=refrigerator_id).order_by('id'))
-                ]
-            except (ValueError, TypeError):
-                # If there's an issue with refrigerator_id, keep column choices empty
-                self.fields['column'].choices = []
+        self.fields['column'].choices = [
+            ('', 'Select Column:')
+        ]
 
 
     def clean_tuppers_to_add(self):
