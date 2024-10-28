@@ -22,6 +22,7 @@ def inventory(request):
     }
     return render(request, 'inventory/inventory.html', context)
 
+@login_required
 def sell_milas(request):
     if request.method == 'POST':
         form = SellMilasForm(request.POST)
@@ -42,7 +43,7 @@ def sell_milas(request):
 
     return render(request, 'inventory/sell_milas.html', {'form': form})
 
-
+@login_required
 def orders(request):
     unfulfilled_orders = Order.objects.filter(tuppers_remaining__gt=0)
 
