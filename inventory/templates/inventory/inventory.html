@@ -22,24 +22,24 @@
             {% endfor %}
         </ul>
     </div>
-        <div id="divheladeras">
-            {% for refrigerator in refrigerators %}
-                <div class="conheladera">
-                    <h3 class="nombre">{{ refrigerator.name }}</h3>
-                    <div class="row">
-                        {% for column in refrigerator.column_set.all %}
-                            <ul class="column ">
-                                {% for subcolumn in column.subcolumn_set.all %}
-                                    {% for tupper in subcolumn.total_tuppers|range_filter %}
-                                        <li class="lis" style="background-color: {{ subcolumn.cut.color }}">{{ subcolumn.cut.name  }}</li>
-                                    {% endfor %}
-                                {% endfor %}
-                            </ul>
-                        {% endfor %}
-                    </div>
+    <div id="divheladeras">
+        {% for refrigerator in refrigerators %}
+            <div class="conheladera">
+                <h2 class="nombre">{{ refrigerator.name }}</h2>
+                <div class="row">
+                    {% for column_data in refrigerator.get_columns_tuppers %}
+                        <ul class="column">
+                            {% for tupper in column_data.tuppers %}
+                                <li class="lis" style="background-color: {{ tupper.color }}">
+                                    {{ tupper.name }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endfor %}
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% endfor %}
+    </div>
     <div id="stock">
         <table class="stock-table">
             <thead>
