@@ -62,7 +62,7 @@
             margin: 0;
             width: 100px;
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: column;
         }
         .lis{
             display: inline-block;
