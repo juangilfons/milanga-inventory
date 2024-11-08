@@ -1,5 +1,6 @@
 from django.test import TestCase
-from .models import SubColumn, Column, Refrigerator, Cut, Tupper
+from django.contrib.auth.models import User
+from .models import SubColumn, Column, Refrigerator, Cut, Tupper, Order
 # Create your tests here.
 
 class TestDB(TestCase):
@@ -64,7 +65,6 @@ class TestDB(TestCase):
         print(list(column.column_generator()))
         print(valid_subcolumn.total_tuppers, valid_subcolumn.milas_tupper_in_use)
 
-
 class CutModelTest(TestCase):
     def setUp(self):
         self.cut = Cut.objects.create(name="Carne", milas_per_tupper=10)
@@ -86,3 +86,43 @@ class CutModelTest(TestCase):
         self.cut.delete()
         with self.assertRaises(Cut.DoesNotExist):
             Cut.objects.get(id=self.cut.id)
+
+
+class TestReorderOnLowStock(TestCase):
+    def setUp(self):
+        self.refrigerator = Refrigerator.objects.create(name="TestRefrigerator")
+        self.column = Column.objects.create(refrigerator=self.refrigerator)
+
+        self.cut_carne = Cut.objects.create(
+            name='Carne',
+            milas_per_tupper=10,
+            reorder_threshold=5,
+            reorder_tuppers=10,
+            is_order_pending=False
+        )
+
+        SubColumn.objects.create(
+            column=self.column,
+            cut=self.cut_carne,
+            total_tuppers=3,
+            milas_tupper_in_use=4
+        )
+
+        self.user = User.objects.create_user(username='testuser', password='12345')
+
+    def test_sell_milas_and_trigger_reorder(self):
+        milas_to_sell = 24
+
+        self.cut_carne.sell_milas(milas_to_sell, self.user)
+        self.cut_carne.refresh_from_db()
+        print("Venta de milanesas realizada, stock actualizado.")
+
+        self.assertTrue(self.cut_carne.is_order_pending, "The reorder should be marked as pending when stock is low.")
+        print("Estado de reorden verificado: is_order_pending está en True.")
+
+        order = Order.objects.filter(cut=self.cut_carne).first()
+        self.assertIsNotNone(order, "An order should have been created when stock reached reorder threshold.")
+        print("Creación de pedido verificada: se generó un pedido al alcanzar el umbral de reorden.")
+
+        self.assertEqual(order.tuppers_requested, self.cut_carne.reorder_tuppers, "The order should request the correct number of tuppers.")
+        print(f"Cantidad de tuppers en el pedido verificada: se solicitaron {order.tuppers_requested} tuppers, como se esperaba.")
