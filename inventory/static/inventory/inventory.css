@@ -1,4 +1,10 @@
-
+        body {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
         .display-3{
             width: 100%;
             font-size:40px;
@@ -38,51 +44,51 @@
             justify-content: space-around;
         }
         #divheladeras {
-            width: 90%;
+            width: 70%;
             display: flex;
-            flex-direction: row;
-            margin: 50px;
+            margin: 50px auto;
             flex-wrap: wrap;
+            align-items: flex-start;
             justify-content: space-between;
+            gap: 40px;
+            margin: 50px auto;
         }
         .row{
-            margin: 0;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            float: left;
-            align-items: flex-end;
-            border: 2px solid black; /* REVISAR SI VA ACA O EN CN HELADERAS */
-            border-top: none; /* REVISAR SI VA ACA O EN CN HELADERAS*/
-            border-radius: 15px; /* REVISAR SI VA ACA O EN CN HELADERAS*/
+            display: flex;              
+            flex-wrap: nowrap;          
+            border: 2px solid black;
+            border-top: none;
+            border-radius: 15px;
+            width: auto;
         }
         .column{
             list-style-type: none;
             padding: 0;
-            margin: 0;
-            width: 100px;
+            margin: 0px;
             display: flex;
             flex-direction: column;
+            flex: 1;
         }
         .lis{
-            display: inline-block;
+            display: flex;
+            justify-content: center; 
+            align-items: center;
             background-color: lightsalmon;
             border: 1px solid black;
             border-radius:7px;
             text-align: center;
+            min-width: 100px;
+            /* width: 8vh; */
         }
         .nombre{ /*NOMBRE H3*/
             text-align: center;
-            padding: 0;
-            margin:auto;
+            margin: 10px 0;
             text-transform: uppercase;
         }
         .conheladera{
-            display: grid;
-            border-radius: 5px;
-            margin: 10px;
-            height: 300px;
-            justify-content: end;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;     
         }
         .sidebar {
             position: fixed;

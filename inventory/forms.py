@@ -2,8 +2,35 @@ from django import forms
 from .models import Cut, Order, Column, Refrigerator
 
 class SellMilasForm(forms.Form):
-    cut = forms.ModelChoiceField(queryset=Cut.objects.all(), label="Seleccionar corte:")
-    milas_to_sell = forms.IntegerField(min_value=1, label="Número milanesas vendidas:")
+    cut = forms.ModelChoiceField(queryset=Cut.objects.all(),label="Seleccionar corte:", required=True)
+    tuppers_to_sell = forms.IntegerField(
+        min_value=1,
+        label="Número de tuppers vendidos:",
+        required=False,
+    )
+    milas_to_sell = forms.IntegerField(
+        min_value=1,
+        label="Número de milanesas vendidas:",
+        required=False,
+    )
+
+    def clean_milas_to_sell(self):
+        data = self.cleaned_data.get('milas_to_sell')
+        return int(data) if data not in (None, '') else 0
+
+    def clean_tuppers_to_sell(self):
+        data = self.cleaned_data.get('tuppers_to_sell')
+        return int(data) if data not in (None, '') else 0
+
+    def clean(self):
+        cleaned_data = super().clean()
+        milas_to_sell = cleaned_data.get('milas_to_sell')
+        tuppers_to_sell = cleaned_data.get('tuppers_to_sell')
+
+        if not milas_to_sell and not tuppers_to_sell:
+            raise forms.ValidationError("Debe ingresar al menos un valor en 'Número de milanesas' o 'Número de tappers'.")
+        
+        return cleaned_data
 
 class FulfillOrderForm(forms.Form):
     tuppers_to_add = forms.IntegerField(
@@ -46,5 +73,30 @@ class FulfillOrderForm(forms.Form):
     def clean_tuppers_to_add(self):
         tuppers_to_add = self.cleaned_data['tuppers_to_add']
         if tuppers_to_add > self.order.tuppers_remaining:
-            raise forms.ValidationError("You cannot add more tuppers than remaining.")
+            raise forms.ValidationError("No puedes guardar mas tuppers.")
         return tuppers_to_add
+
+class RefrigeratorForm(forms.ModelForm):
+    num_columns = forms.IntegerField(
+        min_value=1,
+        required=True,
+        initial=1,
+    )
+    default_capacity = forms.IntegerField(
+        min_value=1,
+        required=True,
+        initial=1,
+    )
+
+    class Meta:
+        model = Refrigerator
+        fields = ['name']
+    
+    def save(self, commit=True):
+        refrigerator = super().save(commit=commit)
+        if commit:
+            refrigerator.create_columns(
+                num_columns=self.cleaned_data['num_columns'],
+                default_capacity=self.cleaned_data['default_capacity'],
+            )
+        return refrigerator

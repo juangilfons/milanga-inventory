@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
+from django.core.validators import MinValueValidator
 
 # Create your models here.
 class Refrigerator(models.Model):
@@ -22,37 +23,75 @@ class Refrigerator(models.Model):
             columns.append(column_data)
 
         return columns
+    
+    def create_columns(self, num_columns, default_capacity):
+        for i in range(num_columns):
+            Column.objects.create(refrigerator=self, capacity=default_capacity)
+    
+    def __str__(self):
+        return self.name
+
+
 class Column(models.Model):
     refrigerator = models.ForeignKey(Refrigerator, on_delete=models.CASCADE)
+    capacity = models.IntegerField(validators=[MinValueValidator(1)])
 
     def column_generator(self):
+        capacity = self.capacity
         subcolumns = SubColumn.objects.filter(total_tuppers__gt=0, column=self)
         total_tuppers_list = subcolumns.values_list('total_tuppers', flat=True)
         map_subcolumns_total_tuppers = dict(zip(subcolumns, total_tuppers_list))
+        tuppers_count = sum(total_tuppers_list)
+        empty_space = capacity - tuppers_count
+
+        transparent_tuppers = [None] * empty_space
+
         groups = [repeat(subcolumn, total_tuppers) for subcolumn, total_tuppers in map_subcolumns_total_tuppers.items()]
 
-        for subcolumns in zip_longest(*groups, fillvalue=None):
-            for subcolumn in subcolumns:
-                if subcolumn is not None:
-                    yield subcolumn.cut
+        ordered_tuppers = transparent_tuppers + list(zip_longest(*groups, fillvalue=None))
+
+        for tuppers in ordered_tuppers:
+            if isinstance(tuppers, tuple):
+                for subcolumn in tuppers:
+                    if subcolumn is not None:
+                        yield subcolumn.cut
+            else:
+                yield None  # Transparent tupper
+
+    def has_space_for_tuppers(self, tuppers_to_add):
+        # Define total capacity for this column
+        total_capacity = self.capacity
+        # Calculate current usage
+        current_usage = sum(SubColumn.objects.filter(column=self).values_list('total_tuppers', flat=True))
+        # Check if there's enough space
+        return (current_usage + tuppers_to_add) <= total_capacity
+
     
     @classmethod
     def get_column(cls, refrigerator_id, column_pos):
         return Column.objects.filter(refrigerator_id=refrigerator_id).order_by('id')[column_pos]
 
     def __str__(self):
-        return f"Refrigerator: {self.refrigerator.name}, Column: {(list(Column.objects.filter(refrigerator=self.refrigerator).order_by('id').values_list('id', flat=True))).index(self.id) + 1}"
+        try:
+            # Get the list of column IDs for the refrigerator
+            column_ids = list(Column.objects.filter(refrigerator=self.refrigerator).order_by('id').values_list('id', flat=True))
+            # Find the index of the current column
+            column_index = column_ids.index(self.id) + 1
+            return f"Refrigerator: {self.refrigerator.name}, Column: {column_index}"
+        except (ValueError, AttributeError):
+            # Handle cases where the column ID is not in the list or self.id is None
+            return f"Refrigerator: {self.refrigerator.name}"
 
 
 class Cut(models.Model):
-    name = models.CharField(max_length=100, default='test')
+    name = models.CharField(max_length=100)
     milas_per_tupper = models.IntegerField()
     reorder_threshold = models.IntegerField(default=10)
     reorder_tuppers = models.IntegerField(default=10)
     is_order_pending = models.BooleanField(default=False)
     color = ColorField(default='#FF0000')
-    unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    days_until_expiration = models.IntegerField(default=7)
+    # unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    days_until_expiration = models.IntegerField(default=180)
 
     @property
     def total_tuppers(self):
@@ -212,7 +251,7 @@ class Order(models.Model):
             self.cut.is_order_pending = False
             self.cut.save()
         self.cut.check_stock_and_reorder()
-        self.save()
+        self.save(update_remaining=True)
         ActionLog.create_action_log(
             user=user,
             obj=self,
@@ -227,10 +266,18 @@ class Order(models.Model):
     #     self.save()
 
     def save(self, *args, **kwargs):
-        # Check if this is a new order (pk is None)
-        if self.pk is None:
-            # Set tuppers_remaining to tuppers_requested for new orders
+        is_new = self.pk is None
+        update_remaining = kwargs.pop('update_remaining', False)
+
+        # Check if this is a new order or being saved through the admin site
+        if is_new or not update_remaining:
+            # Set tuppers_remaining to tuppers_requested
             self.tuppers_remaining = self.tuppers_requested
+
+        if is_new:
+            # Mark the related cut as having a pending order
+            self.cut.is_order_pending = True
+            self.cut.save()
 
             # Set scheduled_date to the next Tuesday if not already set
             if not self.scheduled_date:
@@ -238,6 +285,8 @@ class Order(models.Model):
                 days_until_tuesday = 8 - now.weekday()
                 self.scheduled_date = now + timedelta(days=days_until_tuesday)
 
+        # Set expiration_date based on scheduled_date and days_until_expiration
+        if self.scheduled_date and self.cut.days_until_expiration:
             self.expiration_date = self.scheduled_date + timedelta(days=self.cut.days_until_expiration)
 
         # Call the original save method
@@ -246,6 +295,9 @@ class Order(models.Model):
     def get_column_allocations(self):
         # Retrieve all allocations related to this order
         return OrderAllocation.objects.filter(order=self)
+    
+    def __str__(self):
+        return f'Orden de {self.cut.name}'
 
 class ActionLog(models.Model):
     ACTION_CHOICES = [
@@ -286,8 +338,3 @@ class OrderAllocation(models.Model):
     tuppers_allocated = models.IntegerField()
 
 
-@dataclass
-class Tupper:
-   def __init__(self, subcolumn):
-       self.subcolumn = subcolumn
-       self.cut = subcolumn.cut

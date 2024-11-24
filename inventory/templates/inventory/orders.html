@@ -10,6 +10,13 @@
 {% endblock %}
 
 {% block content %}
+    {% if messages %}
+    <ul class="mensaje-lista">
+        {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
     {% for order, form in forms %}
         <form method="POST" class="form-styled">
             {% csrf_token %}
@@ -20,7 +27,7 @@
             </h2>
             {{ form.as_p }}
             <input type="hidden" name="order_id" value="{{ order.id }}">
-            <button type="submit">Fulfill Order</button>
+            <button type="submit">Guardar Tuppers</button>
         </form>
     {% endfor %}
 

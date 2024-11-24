@@ -30,9 +30,15 @@
                     {% for column_data in refrigerator.get_columns_tuppers %}
                         <ul class="column">
                             {% for tupper in column_data.tuppers %}
-                                <li class="lis" style="background-color: {{ tupper.color }}">
-                                    {{ tupper.name }}
-                                </li>
+                                {% if tupper %}
+                                    <li class="lis" style="background-color: {{ tupper.color }}">
+                                        {{ tupper.name }}
+                                    </li>
+                                {% else %}
+                                    <li class="lis" style="background-color: transparent; border: 1px dashed #cccccc; ">
+                                        Empty
+                                    </li>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     {% endfor %}
@@ -45,13 +51,15 @@
             <thead>
                 <tr>
                     <th>Corte</th>
-                    <th>Stock</th>
+                    <th>Tuppers</th>
+                    <th>Milanesas</th>
                 </tr>
             </thead>
             {% for cut in cuts %}
                 <tr>
                     <td>{{ cut.name }}</td>
                     <td>{{ cut.total_tuppers }}</td>
+                    <td>{{ cut.total_milas}}</td>
                 </tr>
             {% endfor %}
         </table>

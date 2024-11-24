@@ -32,8 +32,8 @@ td {
     vertical-align: middle;
 }
 
-/* Estilo para la primera columna si se necesita un énfasis especial */
-td:first-child {
+
+/* td:first-child {
     font-weight: bold;
     color: #333;
-}
+} */

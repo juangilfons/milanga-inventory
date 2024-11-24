@@ -60,3 +60,11 @@
 .form-styled button[type="submit"]:hover {
     background-color: crimson;
 }
+
+.mensaje-lista {
+    list-style-type: none;
+    text-align: center;
+        font-weight: bold;
+    margin-top: 5px;
+    font-size: 25px;
+}

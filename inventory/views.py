@@ -29,10 +29,17 @@ def sell_milas(request):
         if form.is_valid(): #TODO que pasa si un formulario es invalido?
             cut = form.cleaned_data['cut']
             milas_to_sell = form.cleaned_data['milas_to_sell']
+            tuppers_to_sell = form.cleaned_data['tuppers_to_sell']
 
             try:
-                cut.sell_milas(milas_to_sell, request.user)  # This will handle selling milas
-                messages.success(request, f"Venta exitosa de {milas_to_sell} milanesas de {cut.name}!")
+                milas_per_tupper = cut.milas_per_tupper
+                total_milas_to_sell = milas_to_sell + (tuppers_to_sell * milas_per_tupper)
+
+                if total_milas_to_sell <= 0:
+                    raise ValueError("Debe ingresar una cantidad válida de milanesas o tuppers para vender.")
+                
+                cut.sell_milas(total_milas_to_sell, request.user)  # This will handle selling milas
+                messages.success(request, f"Venta exitosa!")
             except ObjectDoesNotExist:
                 messages.error(request, "No milanesas available for this cut.")
             except ValueError as e:
@@ -61,15 +68,19 @@ def orders(request):
                 column_pos = int(form.cleaned_data.get('column')) - 1
                 column = Column.get_column(refrigerator_id, column_pos)
                 if tuppers_to_add:
-                    try:
-                        order.allocate_tuppers(column_id=column.id, tuppers_to_add=tuppers_to_add, user=request.user)
-                        messages.success(request, f"Successfully fulfilled {tuppers_to_add} tuppers for {order.cut.name}!")
-                        processed_any_form = True
-                    except ValueError as e:
-                        messages.error(request, str(e))  # Handle error if over-allocating tuppers
+                    if not column.has_space_for_tuppers(tuppers_to_add):
+                        messages.error(request, f"Capacidad de columna excedida!")
+                        print(form.errors)
+                    else:
+                        try:
+                            order.allocate_tuppers(column_id=column.id, tuppers_to_add=tuppers_to_add, user=request.user)
+                            messages.success(request, f"Has guardado {tuppers_to_add} tuppers de {order.cut.name}!")
+                            processed_any_form = True
+                        except ValueError as e:
+                            messages.error(request, str(e))  # Handle error if over-allocating tuppers
             else:
                 print(form.errors)
-                messages.error(request, f"Error fulfilling order for {order.cut.name}")
+                messages.error(request, f"Error guardando tuppers de {order.cut.name}")
 
         except Order.DoesNotExist:
             messages.error(request, "Order not found.")
