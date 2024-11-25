@@ -163,7 +163,7 @@
             font-weight: bold;
         }
 
-        tr:nth-child(even) {
+        table tr{
             background-color: #f9f9f9;
         }
 
