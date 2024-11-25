@@ -60,6 +60,8 @@
             border-top: none;
             border-radius: 15px;
             width: auto;
+            align-items: flex-end;
+
         }
         .column{
             list-style-type: none;
