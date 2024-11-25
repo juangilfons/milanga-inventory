@@ -49,19 +49,21 @@
     <div id="stock">
         <table class="stock-table">
             <thead>
-                <tr>
-                    <th>Corte</th>
-                    <th>Tuppers</th>
-                    <th>Milanesas</th>
-                </tr>
+            <tr>
+                <th title="Tipo de corte">Corte</th>
+                <th title="Cantidad total tuppers">Tuppers</th>
+                <th title="Cantidad total milanesas">Milanesas</th>
+            </tr>
             </thead>
+            <tbody>
             {% for cut in cuts %}
                 <tr>
                     <td>{{ cut.name }}</td>
                     <td>{{ cut.total_tuppers }}</td>
-                    <td>{{ cut.total_milas}}</td>
+                    <td>{{ cut.total_milas }}</td>
                 </tr>
             {% endfor %}
+            </tbody>
         </table>
     </div>
 {% endblock %}
