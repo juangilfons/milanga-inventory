@@ -31,4 +31,6 @@
 #nombre{
     font-family: Vegur, 'PT Sans', Verdana, sans-serif;
     display: block;
+        margin: 30px;
+    font-family: 'Helvetica', sans-serif;
 }
