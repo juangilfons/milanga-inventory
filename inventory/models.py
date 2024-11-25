@@ -90,7 +90,7 @@ class Cut(models.Model):
     reorder_tuppers = models.IntegerField(default=10)
     is_order_pending = models.BooleanField(default=False)
     color = ColorField(default='#FF0000')
-    unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
+    # unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
     days_until_expiration = models.IntegerField(default=180)
 
     @property
@@ -109,7 +109,7 @@ class Cut(models.Model):
            subcolumn = SubColumn.objects.create(column=column, cut=self)
 
         subcolumn.add_tuppers(tuppers_num)
-    
+
     def sell_milas(self, milas_num, user):
         total_milas_available = self.total_milas
 
@@ -173,7 +173,7 @@ class SubColumn(models.Model):
     
     def sell_milas(self, milas_sold):
         total_milas_available = self.total_milanesas
-        print(total_milas_available, milas_sold)
+
         if milas_sold > total_milas_available:
             milas_sold = total_milas_available
 

@@ -1,97 +1,71 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from .models import SubColumn, Column, Refrigerator, Cut, Tupper, Order
-# Create your tests here.
+from .models import SubColumn, Column, Refrigerator, Cut, Order, ActionLog, OrderAllocation
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support import expected_conditions as EC
+from django.contrib.auth.models import User
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.conf import settings
+from selenium.webdriver.edge.service import Service
 
-class TestDB(TestCase):
+class InventoryUnitTests(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        print('Pruebas Unitarias\n')
+
     def setUp(self):
-        SubColumn.objects.create(
-            column=Column.objects.create(
-                refrigerator=Refrigerator.objects.create(name="TestRefrigerator")
-                ),
-            cut=Cut.objects.create(name='Carne',milas_per_tupper=10),
-            total_tuppers=3,
-            milas_tupper_in_use=4
+        self.user = User.objects.create(username="test_user", is_superuser=True)
+        self.refrigerator = Refrigerator.objects.create(name="Test Refrigerator")
+        self.column = Column.objects.create(refrigerator=self.refrigerator, capacity=10)
+        self.cut = Cut.objects.create(
+            name="Test Cut",
+            milas_per_tupper=5,
+            reorder_threshold=10,
+            reorder_tuppers=20,
+            days_until_expiration=10
         )
 
-        SubColumn.objects.create(
-            column=Column.objects.get(pk=1),
-            cut=Cut.objects.create(name='Pollo',milas_per_tupper=30),
-            total_tuppers=2,
-            milas_tupper_in_use=15
-        )
-
-        SubColumn.objects.create(
-            column=Column.objects.get(pk=1),
-            cut=Cut.objects.create(name='Soja',milas_per_tupper=60),
-            total_tuppers=2,
-            milas_tupper_in_use=30
-        )
-
-    def test(self):
-        column=Column.objects.get(pk=1)
-        subcolumn1 = column.subcolumn_set.get(id=1)
-
-        subcolumn1.sell_milas(2)
-        subcolumn1.sell_milas(2)
-        print(subcolumn1.total_tuppers, subcolumn1.milas_tupper_in_use)
-        print(list(column.column_generator()))
-  
-    def test_sell_milas(self):
-        user_cut_to_sell = 1
-        milas_to_sell = 10
-
-        valid_subcolumn = SubColumn.search_cut(user_cut_to_sell)
-
-        column = Column.objects.get(pk=1)
-        print(list(column.column_generator()))
-        print(valid_subcolumn.total_tuppers, valid_subcolumn.milas_tupper_in_use)
-
-        valid_subcolumn.sell_milas(milas_to_sell)
-        print(list(column.column_generator()))
-        print(valid_subcolumn.total_tuppers, valid_subcolumn.milas_tupper_in_use)
-
-    def test_add_milas(self):
-        cut_incoming_tuppers = 1
-        tuppers_num = 12
-        selected_column = 1
-        column = Column.objects.get(pk=selected_column)
-
-        valid_subcolumn = SubColumn.search_column_cut(cut_incoming_tuppers, selected_column)
-
-        if valid_subcolumn:
-            valid_subcolumn.add_tuppers(tuppers_num)
+    def test_add_tuppers_to_cut(self):
+        self.cut.add_tuppers(tuppers_num=15, column_id=self.column.id)
         
-        print(list(column.column_generator()))
-        print(valid_subcolumn.total_tuppers, valid_subcolumn.milas_tupper_in_use)
+        subcolumn = SubColumn.objects.get(column=self.column, cut=self.cut)
+        self.assertEqual(subcolumn.total_tuppers, 15, "El total de tuppers en el subcolumna debería ser 15")
+        print("Prueba 1: Tuppers añadidos correctamente al corte.")
 
-class CutModelTest(TestCase):
-    def setUp(self):
-        self.cut = Cut.objects.create(name="Carne", milas_per_tupper=10)
+    def test_sell_milas_from_cut(self):
+        self.cut.add_tuppers(5, self.column.id)
+        self.cut.sell_milas(milas_num=8, user=self.user)
+        
+        action_log = ActionLog.objects.filter(user=self.user, action_type="SALE").first()
+        self.assertIsNotNone(action_log, "Debería existir un registro de venta en ActionLog")
+        self.assertIn("Sold 8 milanesas", action_log.action_description, "El log debería indicar la cantidad correcta de milanesas vendidas")
+        print("Prueba 2: Venta de milanesas registrada correctamente y cantidad actualizada en subcolumnas.")
 
-    def test_create_cut(self):
-        self.assertEqual(self.cut.name, "Carne")
 
-    def test_read_cut(self):
-        cut = Cut.objects.get(id=self.cut.id)
-        self.assertEqual(cut.name, "Carne")
-
-    def test_update_cut(self):
-        self.cut.name = "Pollo"
-        self.cut.save()
-        updated_cut = Cut.objects.get(id=self.cut.id)
-        self.assertEqual(updated_cut.name, "Pollo")
-
-    def test_delete_cut(self):
-        self.cut.delete()
-        with self.assertRaises(Cut.DoesNotExist):
-            Cut.objects.get(id=self.cut.id)
+    def test_order_allocation(self):
+        order = Order.objects.create(cut=self.cut, tuppers_requested=20)
+        order.allocate_tuppers(column_id=self.column.id, tuppers_to_add=10, user=self.user)
+        
+        allocation = OrderAllocation.objects.get(order=order, column=self.column)
+        self.assertEqual(allocation.tuppers_allocated, 10, "Debería haber una asignación de 10 tuppers en OrderAllocation")
+        self.assertEqual(order.tuppers_remaining, 10, "El pedido debería tener 10 tuppers restantes después de la asignación")
+        print("Prueba 3: Asignación de tuppers realizada correctamente y tuppers restantes actualizados.")
 
 
 class TestReorderOnLowStock(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        print('Prueba de Integracion\n')
+
     def setUp(self):
         self.refrigerator = Refrigerator.objects.create(name="TestRefrigerator")
-        self.column = Column.objects.create(refrigerator=self.refrigerator)
+        self.column = Column.objects.create(refrigerator=self.refrigerator, capacity=10)
 
         self.cut_carne = Cut.objects.create(
             name='Carne',
@@ -126,3 +100,73 @@ class TestReorderOnLowStock(TestCase):
 
         self.assertEqual(order.tuppers_requested, self.cut_carne.reorder_tuppers, "The order should request the correct number of tuppers.")
         print(f"Cantidad de tuppers en el pedido verificada: se solicitaron {order.tuppers_requested} tuppers, como se esperaba.")
+
+
+class SellMilasTest(StaticLiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        print('Prueba de Aceptacion\n')
+        
+    def setUp(self):
+        driver_path = getattr(settings, "EDGE_DRIVER_PATH")
+        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.cut_name = "Test Cut"
+        self.cut = Cut.objects.create(
+            name=self.cut_name,
+            milas_per_tupper=5,
+            reorder_threshold=10,
+            reorder_tuppers=20,
+            days_until_expiration=10
+        )
+        self.refrigerator = Refrigerator.objects.create(name="Test Refrigerator")
+        self.column = Column.objects.create(refrigerator=self.refrigerator, capacity=10)
+        self.cut.add_tuppers(5, self.column.id)
+        service = Service(driver_path)
+        self.browser = webdriver.Edge(service=service)
+    
+    def tearDown(self):
+        self.browser.quit()
+
+    def test_sell_milas(self):
+        # Open the login page
+        self.browser.get(f"{self.live_server_url}/accounts/login/")
+        
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.NAME, "username"))
+        )
+        # Log in as the test user
+        username_input = self.browser.find_element(By.NAME, "username")
+        password_input = self.browser.find_element(By.NAME, "password")
+        username_input.send_keys("testuser")
+        password_input.send_keys("testpassword")
+        password_input.send_keys(Keys.RETURN)
+
+        # Navigate to the sell_milas page
+        self.browser.get(f"{self.live_server_url}/sell_milas/")
+
+        #  Wait for the page to load and form to appear
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.TAG_NAME, "form"))
+        )
+
+        # Fill in the form fields
+        cut_select = self.browser.find_element(By.NAME, "cut")
+        cut_select.send_keys(self.cut_name)
+        
+        milas_input = self.browser.find_element(By.NAME, "milas_to_sell")
+        milas_input.send_keys("10")
+        
+        #  Submit the form
+        submit_button = self.browser.find_element(By.CSS_SELECTOR, "button[type='submit']")
+        submit_button.click()
+
+        #  Wait for the success message
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "success"))
+        )
+
+        #  Check that the success message is displayed
+        messages = self.browser.find_element(By.CLASS_NAME, "mensaje-lista").text
+        self.assertIn("Venta exitosa!", messages)
+        print(f"Venta realizada con exito.")
