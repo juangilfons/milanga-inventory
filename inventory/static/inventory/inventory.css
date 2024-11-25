@@ -85,7 +85,7 @@
         .nombre{ /*NOMBRE H3*/
             text-align: center;
             margin: 10px 0;
-            text-transform: uppercase;
+            text-transform: capitalize;
         }
         .conheladera{
             margin-bottom: 20px;
