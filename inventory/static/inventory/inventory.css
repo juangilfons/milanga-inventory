@@ -171,4 +171,7 @@
             background-color: #e8f2c1
 ;
         }
+        th:hover{
+            cursor: pointer;
+        }
 
