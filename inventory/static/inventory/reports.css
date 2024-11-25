@@ -30,5 +30,6 @@
 
 #nombre{
     font-family: Vegur, 'PT Sans', Verdana, sans-serif;
-    display: block
+    display: block;
+    font-size:20px;
 }
