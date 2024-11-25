@@ -26,7 +26,7 @@ def inventory(request):
 def sell_milas(request):
     if request.method == 'POST':
         form = SellMilasForm(request.POST)
-        if form.is_valid(): #TODO que pasa si un formulario es invalido?
+        if form.is_valid():
             cut = form.cleaned_data['cut']
             milas_to_sell = form.cleaned_data['milas_to_sell']
             tuppers_to_sell = form.cleaned_data['tuppers_to_sell']
